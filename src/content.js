@@ -2,7 +2,7 @@ const DEBUG=false;
 let numseen=0, numspoiled=0;
 let unspoiled=[];
 
-var sitesWMut=false;
+var sitesWMut=false, noSpoiling=false;
 
 // called when the user clicks an element of the form (any field or button).
 // The parameter passed is the event object.
@@ -23,6 +23,9 @@ function applyFix(elem) {
 
 // Add an extra child input to any form that only has one
 function spoilFormGet(elem) {
+
+    if (noSpoiling) return;
+
     if(DEBUG) {
         ++numseen;
         unspoiled.push(elem);
@@ -119,6 +122,7 @@ function addMut() {
 
 // move this part of the code here, since it's called multiple times
 function autoDetect(now, when_called) {
+    if (noSpoiling) return;
     if(DEBUG) console.log('autoDetect: '+(++debugAutoDetect)+' ('+when_called+')');
     document.querySelectorAll('form:-webkit-any([method="get" i],:not([method]))').forEach(spoilFormGet,{now});
     if(DEBUG) {
@@ -136,6 +140,7 @@ function autoDetect(now, when_called) {
 
 function catchOpenSearch() {
     if(DEBUG) console.info('catchOpenSearch called');
+    if (noSpoiling) return;
     // OpenSearch - e.g., https://martin-thoma.com/search-engine-autodiscovery/
     // Uses CSS4 selectors, Chrome 49+
     document.querySelectorAll('[type="application/opensearchdescription+xml" i]').forEach(
@@ -183,7 +188,11 @@ function onDOMContentLoaded() {
 
 chrome.runtime.sendMessage({host: location.host}, function(response) {
     if(DEBUG) console.info('site config', response);
-    if (response.siteMut) {
+    if (response.noSpoil) {
+        noSpoiling=true;
+        if(DEBUG) console.info('This host is currently whitelisted');
+        }
+    else if (response.siteMut) {
         sitesWMut=response.siteMut;
         }
 });
