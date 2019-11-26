@@ -6,7 +6,7 @@ var defSitesWMut={
     };
 var sitesWMut={};
 
-var expire=90000;
+var expire=90000, noSpoil={}, TO;
 
 function parseRule(s) {
     var RErule=/^\s*([\w\-\.]+)\s*(.*)$/,
@@ -61,6 +61,25 @@ function getStor() {
 }
 
 getStor();
+
+// hide whitelisted domain
+function WL(h) {
+    noSpoil[h]=Date.now()+expire;
+    clrWL(1);
+}
+
+// clear whitelisted domains after "expire"
+function clrWL(v) {
+    var n, n0=0, now=Date.now();
+    if (v && TO) clearTimeout(TO);
+    TO=null;
+    for (let k in noSpoil) {
+        if ( (n=noSpoil[k]) < now) delete noSpoil[k];
+        else if ( (n < n0) || (n0==0) ) n0=n;  // set nearest time-out
+        }
+    // prepare for next cleanup if needed
+    if (n0) TO=setTimeout(clrWL, (n0-now)+1000);
+}
 
 // receive messages from contentscript
 chrome.runtime.onMessage.addListener(
