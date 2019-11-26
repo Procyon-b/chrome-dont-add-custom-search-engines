@@ -1,0 +1,25 @@
+<html>
+<head>
+<style>
+body {
+  white-space: nowrap;
+}
+#inWL, #noWL {
+  display: none;
+}
+.inWL, .noWL {
+  display: initial !important;
+}
+.noWL ~ * {
+  display: none !important;
+}
+</style>
+</head>
+<body>
+<span id="noWL">This page is not whitelist-able.<br></span>
+<span id="inWL">This website is already whitelisted. Time left: <span id="tl"></span><br><br></span>
+<span id="ifWL"> Whitelist this website for a duration of <span id="dur"></span> seconds:<br><a id="WLhost" href="#"><span id="host"></span></a><br><br>
+The page must at least be reloaded, and sometimes a search query must be done.</span>
+</body>
+<script src="popup.js"></script>
+</html>
